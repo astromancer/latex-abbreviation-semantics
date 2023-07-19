@@ -25,7 +25,7 @@ Load the package by adding these lines in your document preamble.
 
 Abbreviations are defined as follows:
 ```latex
-\abbreviation{XL}{Xeno-linguistics}`
+\abbreviation{XL}{Xeno-linguistics}
 ```
 
 
@@ -101,7 +101,7 @@ Have a look at the `main.tex` document for a more complete example usage.
 
 | File | Description | 
 | --- | --- |  
-| `main.tex`          | Main latex document.
+| `main.tex`          | Main latex document example.
 | `abbrv-defs.tex`    | Your abbreviations should be defined here.
 | `abbrv-styles.tex`  | Styles for formatting the abbreviations.
 | `abbrv-semantic.tex`| Command definition mechanisms live here.
