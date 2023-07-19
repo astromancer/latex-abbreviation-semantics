@@ -37,7 +37,11 @@
 \usepackage{abbrv-semantic}
 \usepackage{abbrv-styles}
 
+% Abbreviation style config
+\absEnableLowercaseDefs{}
 \setabbreviationstyle{long-short-title}
+
+% Load definitions
 \loadglsentries{abbrv-defs.tex}
 
 \makeglossaries
@@ -50,6 +54,10 @@
 % unset all glossary terms for lof / lot / loe
 \glsunsetall
 \tableofcontents
+
+% reset all glossary terms so they get printed as for first use for chapters
+\glsresetall
+
 
 \chapter{Xenoarchaeology}
 

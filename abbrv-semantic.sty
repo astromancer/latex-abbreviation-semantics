@@ -38,8 +38,8 @@
 \let\saved@chapter=\chapter%
 
 \RenewDocumentCommand\chapter{s O{} O{} m}{%
-  % \chapter[⟨toc-title⟩][⟨head-title⟩]{⟨title⟩}
-  % \chapter*[⟨head-title⟩]{⟨title⟩}
+  % \chapter[toc-title][head-title]{title}
+  % \chapter*[head-title]{title}
   \enter{SEC}%
   %
   \IfBooleanTF{#1}{%star
@@ -151,13 +151,13 @@
 }
 
 \newcommand{\@ab@msg@skip}{%
-  Skipping command definition for abbreviation with label "\ab@current@label",
-  definition: "\ab@current@desc".%
+  Skipping command definition for abbreviation with label "\abs@current@label",
+  definition: "\abs@current@desc".%
 }
 
 \newcommand{\@ab@msg@overwrite}[1]{%
-  Overwriting command \@backslashchar#1 for abbreviation with label "\ab@current@label",
-  definition: "\ab@current@desc".%
+  Overwriting command \@backslashchar#1 for abbreviation with label "\abs@current@label",
+  definition: "\abs@current@desc".%
 }
 
 
@@ -246,9 +246,9 @@
 
 
 
-\NewDocumentCommand \ab@context { m   O{#1}   m   O{#3} O{#3} m } {% chktex 1
-  %                               TEX CAPTION SEC TOC   HEAD  LABEL
-  % \ab@context{<glsCmd>}
+\NewDocumentCommand \abs@context { m   O{#1}   m   O{#3} O{#3} m } {% chktex 1
+  %                                TEX CAPTION SEC TOC   HEAD  LABEL
+  % \abs@context{<glsCmd>}
   %        [glsCmdCaption]
   %        {<glsFmtCmd>}
   %        [glsFmtSectionHeader]
@@ -269,10 +269,10 @@
   % \IfNextIn{.!?}{\@}{\xspace}
 }
 
-\NewDocumentCommand \ab@aux { m m m } {
-  \ab@context{\csuse{glsxtr#1#2}} % text form
-             {\csuse{glsfmt#1#2}} % header from
-             {#3} % label
+\NewDocumentCommand \abs@aux { m m m } {
+  \abs@context{\csuse{glsxtr#1#2}} % text form
+              {\csuse{glsfmt#1#2}} % header from
+              {#3} % label
 }
 
 
@@ -291,26 +291,26 @@
     % abbreviation: eg:
     %  \AA*  => Alien Arcology (AA)
     %  \AAs* => Alien Arcologies (AAs)
-    \ab@aux{full}{#2}{#3}
+    \abs@aux{full}{#2}{#3}
   } {
     \str_if_eq:nnTF {#1} {+} {
       % create plus-form command version which explicitly uses long form of
       % abbreviation: eg:
       %  \AA+  => Alien Arcology
       %  \AAs+ => Alien Arcologies
-      \ab@aux{long}{#2}{#3}
+      \abs@aux{long}{#2}{#3}
     } {
       \str_if_eq:nnTF {#1} {-} {
         % create minus-form command version which explicitly uses short form of
         % abbreviation: eg:
         %   \AA-  => AA
         %   \AAs- => AAs
-        \ab@aux{short}{#2}{#3}
+        \abs@aux{short}{#2}{#3}
       } {
         % no embellishment => standard form: full form on first use, short form
         % thereafter eg:
         % \AA  => Alien Arcology (AA) first. AA thereafter
-        \ab@context{\csuse{cgls#2}}{\csuse{glsfmtlong#2}}{#3}
+        \abs@context{\csuse{cgls#2}}{\csuse{glsfmtlong#2}}{#3}
         % since the first argument absorbed by the function is actually the next
         % character in the input stream, we have to leave it in place. In order
         % to get the correct space after the command, we inspect this character.
@@ -340,30 +340,32 @@
 
     % This code will only run if definition allowed, or user requests overwrite
     % Decide which DocumentCommand to use based on if CS already exists
-    \cs_gset_eq:Nc \ab@def@cmd { \cs_if_free:cTF {#1} {New} {Renew} DocumentCommand }
+    \cs_gset_eq:Nc \abs@def@cmd { \cs_if_free:cTF {#1} {New} {Renew} DocumentCommand }
 
     % Define the command
-    \exp_args:Nc \ab@def@cmd { #1 } { m } {
-      \tl_if_empty:nTF {#5} {} { \cs_gset_eq:NN \ab@caseSwitchCmd #5 }
+    \exp_args:Nc \abs@def@cmd { #1 } { m } {
+      \tl_if_empty:nTF {#5} {} { \cs_gset_eq:NN \abs@caseSwitchCmd #5 }
       \cs_ab_variant:nnn {##1} {#3} {#4}
       % switch back to title casing (for long-short-title style)
-      \cs_gset_eq:NN \ab@caseSwitchCmd \ecapitalisefmtwords
+      \cs_gset_eq:NN \abs@caseSwitchCmd \ecapitalisefmtwords
     }
   }
 }
-
 
 \cs_generate_variant:Nn  \cs_ab_define:nnnnn { V }
 
 
 % Token list for current definition
-\tl_new:N \ab@current@desc      % current description
-\tl_new:N \ab@current@label
-\tl_new:N \ab@current@cmd@lc  % lower case command name
-\bool_new:N \ab@def@lc % toggle whether to define lower case commands
-\bool_gset_true:N \ab@def@lc
+\tl_new:N \abs@current@desc      % current description
+\tl_new:N \abs@current@label
+\tl_new:N \abs@current@cmd@lc  % lower case command name
 % CS used to define the commands [(Re)NewDocumentCommand]
-\cs_new_eq:NN \ab@def@cmd \NewDocumentCommand 
+\cs_new_eq:NN \abs@def@cmd \NewDocumentCommand
+% toggle whether to define lower case commands, false by default
+\bool_new:N \abs@def@lc 
+\bool_gset_false:N \abs@def@lc
+\cs_new:Nn \absEnableLowercaseDefs { \bool_gset_true:N \abs@def@lc }
+\cs_new:Nn \absDisableLowercaseDefs { \bool_gset_false:N \abs@def@lc }
 
 
 \NewDocumentCommand \abbreviation {s O{} m D<>{#3} O{#3} D(){#3s} m t!} {% chktex 36 chktex 1
@@ -391,8 +393,8 @@
   \newabbreviation [#2] {#4} {#3} {#7}
   
   % current label and description for messages
-  \tl_gset:Nx \ab@current@label{ \text_purify:n {#4} }
-  \tl_gset:Nx \ab@current@desc { \text_purify:n {#7} }
+  \tl_gset:Nx \abs@current@label{ \text_purify:n {#4} }
+  \tl_gset:Nx \abs@current@desc { \text_purify:n {#7} }
 
   % -------------------------------------------------------------------------- %
   % Singular
@@ -406,7 +408,7 @@
   % lowercase singular
   % -------------------------------------------------------------------------- %
   % check if we need to define lowercase command versions
-  \bool_if:nT {\ab@def@lc} {
+  \bool_if:nT {\abs@def@lc} {
     % define command with lowercase abbreviation letters. eg:
     %   \aa => alien arcology
 
@@ -416,14 +418,14 @@
       %  => lower case command was already defined above
 
       % Define title case command
-      \tl_gset:Nx \ab@current@cmd@lc { \text_titlecase:n {#5} }
-      \cs_ab_define:Vnnnn \ab@current@cmd@lc {#8} {} {#4} {\text_titlecase:n} 
+      \tl_gset:Nx \abs@current@cmd@lc { \text_titlecase:n {#5} }
+      \cs_ab_define:Vnnnn \abs@current@cmd@lc {#8} {} {#4} {\text_titlecase:n} 
       
     }{
       % user input abbreviation label is upper case
       % Define lower case command variant
-      \tl_gset:Nx \ab@current@cmd@lc { \text_lowercase:n {#5} }
-      \cs_ab_define:Vnnnn \ab@current@cmd@lc {#8} {} {#4} {\text_lowercase:n}
+      \tl_gset:Nx \abs@current@cmd@lc { \text_lowercase:n {#5} }
+      \cs_ab_define:Vnnnn \abs@current@cmd@lc {#8} {} {#4} {\text_lowercase:n}
       
     }
   }
@@ -444,17 +446,17 @@
     % lowercase plural
     % -------------------------------------------------------------------------- %
     % check if we need to define lowercase command versions for plural terms
-    \bool_if:nT {\ab@def@lc} {
+    \bool_if:nT {\abs@def@lc} {
       % check if user input a lowercase command name, in which case, the
       % lowercase plural verion was define above
       \if_lowercase:nTF {#5} {} {
         % user input is uppercase
         % Set lowercase plural name variable
-        \tl_gset:Nx \ab@current@cmd@lc { \text_lowercase:n {#6} }
+        \tl_gset:Nx \abs@current@cmd@lc { \text_lowercase:n {#6} }
 
         % define command with lowercase plural abbreviation letters. eg:
         %   \aas => alien arcologies
-        \cs_ab_define:Vnnnn \ab@current@cmd@lc {#8} {pl} {#4} {\text_lowercase:n} 
+        \cs_ab_define:Vnnnn \abs@current@cmd@lc {#8} {pl} {#4} {\text_lowercase:n} 
         
       }
     }
