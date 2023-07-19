@@ -1,0 +1,69 @@
+# latex
+#*.pdf
+*.ps
+*.aux
+*.*glo
+*.*glg
+*.*gls
+*.idx
+*.log
+*.toc
+*.ist
+*.acn
+*.acr
+*.alg
+*.bbl
+*.blg
+*.bcf
+*.dvi
+*.xdv
+*.ilg
+*.ind
+*.lof
+*.lot
+*.loe
+*.maf
+*.mtc
+*.mtc1
+*.out
+*.run.xml
+*.synctex.gz
+*.synctex(busy)
+*.wrt
+
+# kile
+.kile
+*.backup  
+*.kilepr
+*.swp
+
+# kate
+*.kate-swp
+**~
+
+# jabref
+.\$*\$
+
+# vscode
+.vscode
+*.code-workspace
+
+# pycharm
+.idea
+
+# linux deleted files still in use
+*.fuse_hidden*
+
+# libre office
+**.~lock*
+
+# mklatex
+*.fdb_latexmk
+*.fls
+
+# latexindent
+*.bak*
+
+# python
+*.pyc
+*-checkpoint.ipynb

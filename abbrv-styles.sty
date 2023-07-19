@@ -1,0 +1,47 @@
+% !TEX root = main.tex
+% ---------------------------------------------------------------------------- %
+% Abbreviation styles
+% ---------------------------------------------------------------------------- %
+
+\RequirePackage{glossaries-extra}
+
+
+% ignore prepositions in title casing for glossary description field
+\forcsvlist{\gMFUnocap}{in,the,of,at,to,for}
+
+% ---------------------------------------------------------------------------- %
+%  Title casing style. Used by case switching commands eg: \QPO \qpo
+
+\newcommand*{\@ab@lst@formatHelper}[3]{%
+  \glsfirstlongfont{%
+  \ecapitalisefmtwords*{\@nameuse{glsaccesslong#3}{#1}}\ifglsxtrinsertinside#2\fi}%
+  \ifglsxtrinsertinside\else#2\fi\glsxtrfullsep{#1}%
+  \glsxtrparen{\glsfirstabbrvfont{\glsaccessshort{#1}}}%
+}
+
+% Default case switch for style
+\let\ab@caseSwitchCmd\ecapitalisefmtwords%
+% \newcommand{\ab@caseSwitchCmd}[1]{\ecapitalisefmtwords*{#1}}%
+
+
+\newabbreviationstyle{long-short-title}{%
+  % Setup
+  \GlsXtrUseAbbrStyleSetup{long-short}
+}{% Formatting
+  \GlsXtrUseAbbrStyleFmts{long-short}%
+  % Support title casing switch
+  \renewcommand*{\glslongfont}[1]{\ab@caseSwitchCmd{##1}}% glslongdefaultfont
+  % Always use title case for full forms 
+  \renewcommand*{\glsxtrfullformat}[2]{%
+    \Glsxtrfullformat{##1}{##2}%
+  }%
+  \renewcommand*{\glsxtrfullplformat}[2]{%
+    \Glsxtrfullplformat{##1}{##2}%
+  }%
+  \renewcommand*{\Glsxtrfullformat}[2]{%
+    \@ab@lst@formatHelper{##1}{##2}{}%
+  }%
+  \renewcommand*{\Glsxtrfullplformat}[2]{%
+    \@ab@lst@formatHelper{##1}{##2}{pl}%
+  }%
+}

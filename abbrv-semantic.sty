@@ -1,0 +1,462 @@
+% !TEX root = main.tex
+
+%*******************************************************************************
+% Glossaries / Abbreviations
+%*******************************************************************************
+\RequirePackage{glossaries-extra}
+\RequirePackage{hyperref}
+\RequirePackage{etoolbox}
+
+% ---------------------------------------------------------------------------- %
+% Toggles for tracking sections
+
+% For sectioning commands
+\newtoggle{inSEC}
+\togglefalse{inSEC}% Set initial value
+% For Table of Contents
+\newtoggle{inTOC}
+\togglefalse{inTOC}% Set initial value
+% For Page headers
+\newtoggle{inHEAD}
+\togglefalse{inHEAD}% Set initial value
+% For glossary
+\newtoggle{inGLS}
+\togglefalse{inGLS}% Set initial value
+
+% Set toggles
+\newcommand*{\enter}[1]{\global\toggletrue{in#1}}%
+\newcommand*{\exit}[1]{\global\togglefalse{in#1}}%
+
+% Wrappers for setting and unsetting toggles
+\newcommand*{\wrap}[2]{\texorpdfstring{\enter{#1}#2\exit{#1}}{#2}}
+\newcommand*{\wrapTOC}[1]{\protecting{\wrap{TOC}{#1}}}
+\newcommand*{\wrapHEAD}[1]{\protecting{\wrap{HEAD}{#1}}}
+
+
+% ---------------------------------------------------------------------------- %
+% Detect if in chapter heading
+\let\saved@chapter=\chapter%
+
+\RenewDocumentCommand\chapter{s O{} O{} m}{%
+  % \chapter[⟨toc-title⟩][⟨head-title⟩]{⟨title⟩}
+  % \chapter*[⟨head-title⟩]{⟨title⟩}
+  \enter{SEC}%
+  %
+  \IfBooleanTF{#1}{%star
+    % \def\chap@hdr{\ifblank{#2}{#4}{#2}}%
+    \saved@chapter*[\wrapTOC{\ifblank{#2}{#4}{#2}}]{#4}
+  }{% no star
+    % \def\chap@toc{\ifblank{#2}{#4}{#2}}%
+    % \def\chap@hdr{\ifblank{#3}{#4}{#3}}%
+    \saved@chapter[\wrapTOC{\ifblank{#2}{#4}{#2}}]%
+               [\wrapHEAD{\ifblank{#3}{#4}{#3}}]%
+               {#4}%
+  }%
+  \exit{SEC}%
+}
+
+
+% Section
+% ---------------------------------------------------------------------------- %
+% hooks for lower level sectioning commands
+
+\let\saved@section=\section%
+\let\saved@subsection=\subsection%
+\let\saved@subsubsection=\subsubsection%
+
+
+\RenewDocumentCommand \section { s O{} O{} m } {%
+  % \section[toc-title][head-title]{title}
+  % \section*{title}
+  \enter{SEC}%
+  \IfBooleanTF{#1}{% star
+    % optional arguments simply ignored TODO WARNING
+    \saved@section*{#4}%
+  }{% no star
+    \saved@section[\wrapTOC{\ifblank{#2}{#4}{#2}}]%
+                  [\wrapHEAD{\ifblank{#3}{#4}{#3}}]%
+                  {#4}%
+  }
+  \exit{SEC}%
+}
+
+\RenewDocumentCommand \subsection {s m} {%
+  \enter{SEC}%
+  \IfBooleanTF{#1}{\saved@subsection}{\saved@subsection*}{#2}
+  \belowpdfbookmark{#2}{bmk:#2}
+  \exit{SEC}%
+}
+
+\RenewDocumentCommand\subsubsection{s m}{%
+  \enter{SEC}%
+  \IfBooleanTF{#1}{\saved@subsubsection}{\saved@subsubsection*}{#2}
+  \exit{SEC}%
+}
+
+% ---------------------------------------------------------------------------- %
+% Detect if in caption
+\let\savedCaption=\caption%
+\RenewDocumentCommand\caption{O{#2} m}{%
+  \savedCaption[\wrapTOC{#1}]{#2}%
+}
+
+% Detect whether we are in a floating environment
+% https://tex.stackexchange.com/a/99885
+\newcommand\InFloat[2]{\@ifundefined{@captype}{#2}{#1}}
+
+
+% ---------------------------------------------------------------------------- %
+% Abbreviation definition mechanism
+% ---------------------------------
+% Automated new command definitions for new abbreviations
+%   eg: \abbreviation*[longplural=Alien Arcologies]{AA}{Alien Arcology}
+% will create the glossaries definition of the abbreviation via
+%   \newabbreviation{AA}{AA}{Alien Arcology}
+% as well as creating the following commands as shortcuts:
+%   \AA   : \ab{AA}
+%   \AA*  : \af{AA}
+%   \AA+  : \al{AA}
+%   \AA-  : \as{AA}
+%   If the starred version \abbreviation* is used, a plural form shortcut
+%   commands are also created
+%   \AAs  : \abp{AA}
+%   \AAs* : \afp{AA}
+%   \AAs+ : \alp{AA}
+%   \AAs- : \asp{AA}
+
+
+% Use \glsfmt<x><y>{label} style commands inside captions automatically.
+% *Requires using \gcaption for captioning floats.*
+% These commands essentially behave as though you have used \glsxtrshort,
+% \glstext etc with the options noindex and hyper=false. The text produced won’t
+% be converted to upper case in the page headings by default. If you want the
+% text converted to upper case you need to set the headuc attribute to “true”
+% for the appropriate category.
+
+
+
+% ---------------------------------------------------------------------------- %
+% Messages
+\newcommand{\@ab@msg@alreadyDefined}[1]{%
+  Control sequence \@backslashchar#1 already exists. \@ab@msg@skip%
+}
+\newcommand{\@ab@msg@invalidName}[1]{%
+  Invalid control sequence name \@backslashchar#1. \@ab@msg@skip.%
+}
+\newcommand{\@ab@msg@freeName}[1]{%
+  Free name \@backslashchar#1.%
+}
+\newcommand{\@ab@msg@allowDefineName}[1]{%
+  Definition of name \@backslashchar#1 is allowed.%
+}
+
+\newcommand{\@ab@msg@skip}{%
+  Skipping command definition for abbreviation with label "\ab@current@label",
+  definition: "\ab@current@desc".%
+}
+
+\newcommand{\@ab@msg@overwrite}[1]{%
+  Overwriting command \@backslashchar#1 for abbreviation with label "\ab@current@label",
+  definition: "\ab@current@desc".%
+}
+
+
+
+\ExplSyntaxOn
+
+% Message for already defined control sequences
+\msg_new:nnn{abbrv-utils}{MsgAlreadyDefined}{\@ab@msg@alreadyDefined{#1}}
+\msg_new:nnn{abbrv-utils}{MsgInvalidName}{\@ab@msg@invalidName{#1}}
+\msg_new:nnn{abbrv-utils}{MsgFreeName}{\@ab@msg@freeName{#1}}
+\msg_new:nnn{abbrv-utils}{MsgAllowDefineName}{\@ab@msg@allowDefineName{#1}}
+\msg_new:nnn{abbrv-utils}{MsgDefineCmd}{Now\ defining:\ \@backslashchar#1}
+\msg_new:nnn{abbrv-utils}{MsgOverwriteCmd}{\@ab@msg@overwrite{#1}}
+% \msg_new:nnn{abbrv-utils}{WTF}{WTF #1}
+
+\cs_generate_variant:Nn \msg_note:nnn {nnx}
+% ---------------------------------------------------------------------------- %
+% Regexes / Macros for checking valid command names
+
+\int_new:N \g_not_letter_count
+\regex_new:N \g_invalid_CS_regex
+\regex_set:Nn \g_invalid_CS_regex { [\d\h\s\v\\/:_] }
+
+\prg_new_conditional:Npnn \if_valid_cs_name:n #1 { p, T, TF } {
+  \regex_count:NnN \g_invalid_CS_regex {#1} \g_not_letter_count
+  \int_compare:nNnTF {\g_not_letter_count} {=} {0}
+    {\prg_return_true:}
+    {\prg_return_false:}
+}
+
+
+% check lower case
+\int_new:N \g_uppercase_count
+\regex_new:N \g_uppercase_regex
+\regex_set:Nn \g_uppercase_regex { [A-Z] }
+
+\prg_new_conditional:Npnn \if_lowercase:n #1 { p, T, TF } {
+  \regex_count:NnN \g_uppercase_regex {#1} \g_uppercase_count
+  \int_compare:nNnTF {\g_uppercase_count} {=} {0}
+    {\prg_return_true:}
+    {\prg_return_false:}
+}
+
+% ---------------------------------------------------------------------------- %
+
+\cs_new:Nn \if_csname_free_else_warn:nnT {
+  \cs_if_free:cTF {#1} {
+    % \ifcsundef{#1} {
+    % free
+    % \msg_note:nnn{abbrv-utils}{MsgFreeName}{#1}
+    #3
+  }{
+    % CS already exists
+    \bool_if:nTF #2 {
+      % overwrite
+      \msg_note:nnn{abbrv-utils}{MsgOverwriteCmd}{#1}
+      #3
+    } {
+      \msg_note:nnn{abbrv-utils}{MsgAlreadyDefined}{#1}
+    }
+  }
+}
+
+\cs_new:Nn \if_csname_valid_else_warn:nT {
+  \if_valid_cs_name:nTF {#1} {
+    % valid command name. execute code
+    #2
+  }{% invalid command name
+    \msg_note:nnn{abbrv-utils}{MsgInvalidName}{#1}
+  }
+}
+
+\cs_new:Nn \if_csdef_allowed:nnT {
+  \if_csname_free_else_warn:nnT {#1} {#2} {
+    % free
+    \if_csname_valid_else_warn:nT {#1} {
+      % valid command name
+      % \msg_note:nnn{abbrv-utils}{MsgAllowDefineName}{#1}
+      #3
+    }
+  }
+}
+
+\cs_generate_variant:Nn \if_csdef_allowed:nnT { xnT }
+
+
+
+
+\NewDocumentCommand \ab@context { m   O{#1}   m   O{#3} O{#3} m } {% chktex 1
+  %                               TEX CAPTION SEC TOC   HEAD  LABEL
+  % \ab@context{<glsCmd>}
+  %        [glsCmdCaption]
+  %        {<glsFmtCmd>}
+  %        [glsFmtSectionHeader]
+  %        [glsFmtPageHeader]
+  %        {entryLabel}
+  \iftoggle{inTOC}{#4}{% TOC\ \glsfmtxxx in TOC
+    \iftoggle{inSEC}{#3}{% SECTIONING\ \glsfmtxxx in sectioning header
+      \iftoggle{inHEAD}{#5}{% HEADING\ \glsfmtxxx in page header
+        \InFloat{#2}{% CAPTION\ \gls in normal text captions
+          \iftoggle{inGLS}
+            {#1[noindex]}% GLOSSARY printing. don't index these uses
+            {#1}% TEXTING\ \gls in text
+        }
+      }%
+    }%
+  }{#6}% entry label
+  % space correction for sentence ending space and space
+  % \IfNextIn{.!?}{\@}{\xspace}
+}
+
+\NewDocumentCommand \ab@aux { m m m } {
+  \ab@context{\csuse{glsxtr#1#2}} % text form
+             {\csuse{glsfmt#1#2}} % header from
+             {#3} % label
+}
+
+
+
+\cs_new:Npn \cs_ab_variant:nnn #1 #2 #3 {
+  % #1 variant
+  % #2 "pl" or ""
+  % #3 label
+
+  % \tl_show:n {#1}
+  % \tl_show:n {#2}
+  % \tl_show:n {#3}
+% 
+  \str_if_eq:nnTF {#1} {*} {
+    % create star-form command version which explicitly uses full form of
+    % abbreviation: eg:
+    %  \AA*  => Alien Arcology (AA)
+    %  \AAs* => Alien Arcologies (AAs)
+    \ab@aux{full}{#2}{#3}
+  } {
+    \str_if_eq:nnTF {#1} {+} {
+      % create plus-form command version which explicitly uses long form of
+      % abbreviation: eg:
+      %  \AA+  => Alien Arcology
+      %  \AAs+ => Alien Arcologies
+      \ab@aux{long}{#2}{#3}
+    } {
+      \str_if_eq:nnTF {#1} {-} {
+        % create minus-form command version which explicitly uses short form of
+        % abbreviation: eg:
+        %   \AA-  => AA
+        %   \AAs- => AAs
+        \ab@aux{short}{#2}{#3}
+      } {
+        % no embellishment => standard form: full form on first use, short form
+        % thereafter eg:
+        % \AA  => Alien Arcology (AA) first. AA thereafter
+        \ab@context{\csuse{cgls#2}}{\csuse{glsfmtlong#2}}{#3}
+        % since the first argument absorbed by the function is actually the next
+        % character in the input stream, we have to leave it in place. In order
+        % to get the correct space after the command, we inspect this character.
+        % Sentence ending characters are followed by inter-sentence space which
+        % is larger that and regular space. \xspace determined when to add a
+        % regular space.
+        \str_if_in:nnTF {.!?} {#1} {#1\@} {\xspace#1}
+      }
+    }
+  }
+  % % This happens after the embellished commands
+  % % space correction for sentence ending space and regular space
+  % \IfNextIn{.!?}{\@}{\xspace}
+}
+
+\cs_new:Nn \cs_ab_define:nnnnn { 
+  % #1 command name
+  % #2 overwrite flag
+  % #3 "pl" or ""
+  % #4 label
+  % #5 case switch command
+
+  % define command with same name as the abbreviation if possible.
+  \if_csdef_allowed:xnT {#1} {#2} {
+    % name valid for new command
+    \msg_note:nnn{abbrv-utils}{MsgDefineCmd}{#1}
+
+    % This code will only run if definition allowed, or user requests overwrite
+    % Decide which DocumentCommand to use based on if CS already exists
+    \cs_gset_eq:Nc \ab@def@cmd { \cs_if_free:cTF {#1} {New} {Renew} DocumentCommand }
+
+    % Define the command
+    \exp_args:Nc \ab@def@cmd { #1 } { m } {
+      \tl_if_empty:nTF {#5} {} { \cs_gset_eq:NN \ab@caseSwitchCmd #5 }
+      \cs_ab_variant:nnn {##1} {#3} {#4}
+      % switch back to title casing (for long-short-title style)
+      \cs_gset_eq:NN \ab@caseSwitchCmd \ecapitalisefmtwords
+    }
+  }
+}
+
+
+\cs_generate_variant:Nn  \cs_ab_define:nnnnn { V }
+
+
+% Token list for current definition
+\tl_new:N \ab@current@desc      % current description
+\tl_new:N \ab@current@label
+\tl_new:N \ab@current@cmd@lc  % lower case command name
+\bool_new:N \ab@def@lc % toggle whether to define lower case commands
+\bool_gset_true:N \ab@def@lc
+% CS used to define the commands [(Re)NewDocumentCommand]
+\cs_new_eq:NN \ab@def@cmd \NewDocumentCommand 
+
+
+\NewDocumentCommand \abbreviation {s O{} m D<>{#3} O{#3} D(){#3s} m t!} {% chktex 36 chktex 1
+  % -------------------------------------------------------------------------- %
+  % Argument syntax:
+  %   #1 star (*) if starred, also define plural form commands
+  %   #2 \newabbreviation key=val options
+  %   #3 short form abbreviation letters for typesetting in document eg: AA. 
+  %   #4 <optional> String to be used as glossaries label eg: abr:AA. 
+  %       Defaults to short form, eg AA.
+  %   #5 [optional] command name: default is same letters as abbreviation.
+  %       Defaults to short form, eg \AA.
+  %   #6 (optional) command name for plural form: default is same letters as 
+  %      abbreviation with 's' appended eg:  \AAs
+  %   #7 The abbreviation description eg: {Alien Arcology}
+  %   #8 If "!" follows command, force overwrite of control sequences if they 
+  %      have already previously been defined. Use with caution!
+
+  % NOTE: You will still need \texorpdfstring{}{} explicitly in the section
+  % header for the suffixed versions to get correct bookmark text. Haven't found a
+  % way around this yet...
+
+  % first define the abbreviation via glossaries' \newabbreviation
+  % \newabbreviation[options]{label}{short}{long}
+  \newabbreviation [#2] {#4} {#3} {#7}
+  
+  % current label and description for messages
+  \tl_gset:Nx \ab@current@label{ \text_purify:n {#4} }
+  \tl_gset:Nx \ab@current@desc { \text_purify:n {#7} }
+
+  % -------------------------------------------------------------------------- %
+  % Singular
+  % -------------------------------------------------------------------------- %
+  % define command with same name as the abbreviation if possible.
+  \cs_ab_define:nnnnn {#5} {#8} {} {#4} {} {}
+
+  % Replacement commands for PDF strings (bookmarks etc)
+  \pdfstringdefDisableCommands{\csdef{#5}{\glsfmtlong{#4}}}
+
+  % lowercase singular
+  % -------------------------------------------------------------------------- %
+  % check if we need to define lowercase command versions
+  \bool_if:nT {\ab@def@lc} {
+    % define command with lowercase abbreviation letters. eg:
+    %   \aa => alien arcology
+
+    % check if user input a lower case command name, 
+    \if_lowercase:nTF {#5} {
+      %  user input abbreviation label is lower case
+      %  => lower case command was already defined above
+
+      % Define title case command
+      \tl_gset:Nx \ab@current@cmd@lc { \text_titlecase:n {#5} }
+      \cs_ab_define:Vnnnn \ab@current@cmd@lc {#8} {} {#4} {\text_titlecase:n} 
+      
+    }{
+      % user input abbreviation label is upper case
+      % Define lower case command variant
+      \tl_gset:Nx \ab@current@cmd@lc { \text_lowercase:n {#5} }
+      \cs_ab_define:Vnnnn \ab@current@cmd@lc {#8} {} {#4} {\text_lowercase:n}
+      
+    }
+  }
+
+  % -------------------------------------------------------------------------- %
+  % Plural
+  % -------------------------------------------------------------------------- %
+  % if starred, also define plural form command
+  \bool_if:nT {#1} {
+    % \msg_note:nnn{abbrv-utils}{WTF}{#1}
+
+    % Define the command
+    \cs_ab_define:nnnnn {#6} {#8} {pl} {#4} {} {}
+
+    % Replacement commands for PDF strings (bookmarks etc)
+    \pdfstringdefDisableCommands{\csdef{#6}{\glsfmtlongpl{#4}}}
+
+    % lowercase plural
+    % -------------------------------------------------------------------------- %
+    % check if we need to define lowercase command versions for plural terms
+    \bool_if:nT {\ab@def@lc} {
+      % check if user input a lowercase command name, in which case, the
+      % lowercase plural verion was define above
+      \if_lowercase:nTF {#5} {} {
+        % user input is uppercase
+        % Set lowercase plural name variable
+        \tl_gset:Nx \ab@current@cmd@lc { \text_lowercase:n {#6} }
+
+        % define command with lowercase plural abbreviation letters. eg:
+        %   \aas => alien arcologies
+        \cs_ab_define:Vnnnn \ab@current@cmd@lc {#8} {pl} {#4} {\text_lowercase:n} 
+        
+      }
+    }
+  }
+}

@@ -1,0 +1,77 @@
+\documentclass[a4paper,12pt,twoside,openright]{memoir}
+
+\usepackage{xspace}
+
+% Define a document font:
+\usepackage{fontspec}
+% The fontspec package allows users of either XETEX or LuaTEX to load OpenType
+% fonts in a LATEX document. No font installation is necessary, and font
+% features can be selected and used as desired throughout the document.
+% \defaultfontfeatures{Ligatures=TeX}
+
+% nice hyperlinks
+\usepackage[svgnames]{xcolor}
+\usepackage[
+  colorlinks=true,
+  linkcolor=DarkGreen,% note this will change colour of glossary terms
+  pdfencoding=auto,
+  % uses Unicode for the bookmarks and PDFDocEncoding, if Unicode is not
+  % necessary for the bookmark string.
+]{hyperref}
+
+% glossaries
+\usepackage[
+  nogroupskip,  % no newline between next alphabetical group
+  noredefwarn,  % suppress the warnings that occur when theglossary environment 
+  % and \printglossary are redeﬁned while glossaries is loading. (memoir)
+  toc,          % add glossaries to toc
+  section,      % make glossaries appear as sections in toc
+  hyperfirst=false, % turn off all first-use hyperlinking. Will re-enable below 
+  shortcuts=all, % allow shortened macro names
+  automake
+]{glossaries-extra}
+
+\usepackage{kantlipsum}
+
+% Load the package and styles
+\usepackage{abbrv-semantic}
+\usepackage{abbrv-styles}
+
+\setabbreviationstyle{long-short-title}
+\loadglsentries{abbrv-defs.tex}
+
+\makeglossaries
+
+% ---------------------------------------------------------------------------- %
+% Document start
+% ---------------------------------------------------------------------------- %
+\begin{document}
+
+% unset all glossary terms for lof / lot / loe
+\glsunsetall
+\tableofcontents
+
+\chapter{Xenoarchaeology}
+
+\section{Filler section}
+\kant*[1-2]
+
+\section{A section on \AAs{}} % \AAs 
+In the fascinating world of Xenoarchaeology, \AAs are of particular interest.
+It is predicted that one day \AAs will be the largest artificially made 
+structures in the universe. In the future, everyone will live in a big \aa+. 
+New-York will have a 691 story \aa. All the \aas+ will be interconnected by an
+underground network of tubes called the xenorail!
+
+
+\section{Another meaningless section}
+\kant*[3-4]
+
+% ---------------------------------------------------------------------------- %
+% Glossary
+% ---------------------------------------------------------------------------- %
+% \clearpage
+\printglossary
+
+
+\end{document}

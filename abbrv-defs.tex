@@ -1,0 +1,38 @@
+% ---------------------------------------------------------------------------- %
+% Abbreviation definitions
+% ------------------------
+% Automated new command definitions for new abbreviations
+%   eg: \abbreviation*[longplural=Alien Arcologies]{AA}{Alien Arcology}
+% will create the glossaries definition of the abbreviation via
+%   \newabbreviation{AA}{AA}{Alien Arcology}
+% as well as creating the following commands as shortcuts:
+%   \AA   : \ab{AA}
+%   \AA*  : \af{AA}
+%   \AA+  : \al{AA}
+%   \AA-  : \as{AA}
+%   If the starred version \abbreviation* is used, a plural form shortcut
+%   commands are also created
+%   \AAs  : \abp{AA}
+%   \AAs* : \afp{AA}
+%   \AAs+ : \alp{AA}
+%   \AAs- : \asp{AA}
+
+% \abbreviation command
+% Argument syntax:
+%   #1 star (*) if starred, also define plural form commands
+%   #2 [optional] \newabbreviation key val options
+%   #3 {manditory} short form abbreviation letters for typesetting in document 
+%       eg: AA. 
+%   #4 <optional> String to be used as glossaries label eg: abr:AA. 
+%       Defaults to short form, eg AA.
+%   #5 [optional] command name: default is same letters as abbreviation.
+%       Defaults to short form, eg \AA.
+%   #6 (optional) command name for plural form: default is same letters as 
+%      abbreviation with 's' appended eg:  \AAs
+%   #7 {manditory} The abbreviation description 
+%       eg: Alien Arcology
+%   #8 optional literal "!" follows command, force overwrite of control sequences
+%      if they have already previously been defined. Use with caution!
+
+\abbreviation*[longplural={Alien Arcologies}]{AA}{Alien Arcology}!
+% Note the trailing ! is required here to oerwritet the builtin \AA and \aa commands
