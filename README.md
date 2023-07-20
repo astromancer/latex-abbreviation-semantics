@@ -102,11 +102,30 @@ In addition, the following plural forms will also be available.
 In addition, the lower case plural commands will also be defined if
 `\absEnableLowercaseDefs{}` was used in the preamble.
 
-Have a look at the `main.tex` document for a more complete example usage.
 
 ## Changing the command names and internal labels
-If you'd like to use a command name that is named differently from the 
+If you'd like to use a command name that is named differently from the
+abbreviation short form, you may use the optional parameters as below:
+```latex
+\abbreviation*[longplural=Supernovae]{SN}<mylabel:SNe>[BANG](SNe){Supernova}
+```
+This will define the entry with internal label `mylabel:SNe` having short form
+`SN` and long form `Supernova`. The singular command form for the abbreviation
+is `\BANG`, which will expand identically to the standard glossary command
+`\cgls{mylabel:SNe}` in the text context. Likewise, the plural form command
+`\SNe` will expand identically to the standard glossary command
+`\cglspl{mylabel:SNe}`
 
+## Sectioning commands
+The abbreviation commands can usually be used in sectioning commands without
+problems. Usage inside sectioning commands will always expand to long form and
+will suppress the hyperlink (internally, using the `\glsfmt...` type commands
+from `glossaries-extra`). This also means that the terms appear as long form in
+the document table of contents and page headers etc. PDF bookmarks are 
+also expanded to long form and will resolve correctly.
+
+ Have a look at the [`main.tex`](/main.tex) document for a more complete example
+usage that also demonstrates these use cases.
 
 # Repo File Descriptions
 
@@ -116,6 +135,9 @@ If you'd like to use a command name that is named differently from the
 | [`abbrv-defs.tex`](/abbrv-defs.tex)         | Your abbreviations should be defined here.
 | [`abbrv-styles.tex` ](/abbrv-styles.tex)    | Styles for formatting the abbreviations.
 | [`abbrv-semantic.tex`](/abbrv-semantic.tex) | Command definition mechanisms live here.
+
+# Contribute
+PRs are welcome! 🚀😎
 
 # License
 [MIT](/LICENSE)
