@@ -278,7 +278,7 @@
 
 
 \cs_new:Npn \cs_ab_variant:nnn #1 #2 #3 {
-  % #1 variant
+  % #1 variant * or + or - or whatever came next in the input stream
   % #2 "pl" or ""
   % #3 label
 
@@ -286,44 +286,45 @@
   % \tl_show:n {#2}
   % \tl_show:n {#3}
 % 
-  \str_if_eq:nnTF {#1} {*} {
+
+  \str_case:nnTF {#1} {
     % create star-form command version which explicitly uses full form of
     % abbreviation: eg:
     %  \AA*  => Alien Arcology (AA)
     %  \AAs* => Alien Arcologies (AAs)
-    \abs@aux{full}{#2}{#3}
-  } {
-    \str_if_eq:nnTF {#1} {+} {
-      % create plus-form command version which explicitly uses long form of
-      % abbreviation: eg:
-      %  \AA+  => Alien Arcology
-      %  \AAs+ => Alien Arcologies
-      \abs@aux{long}{#2}{#3}
-    } {
-      \str_if_eq:nnTF {#1} {-} {
-        % create minus-form command version which explicitly uses short form of
-        % abbreviation: eg:
-        %   \AA-  => AA
-        %   \AAs- => AAs
-        \abs@aux{short}{#2}{#3}
-      } {
-        % no embellishment => standard form: full form on first use, short form
-        % thereafter eg:
-        % \AA  => Alien Arcology (AA) first. AA thereafter
-        \abs@context{\csuse{cgls#2}}{\csuse{glsfmtlong#2}}{#3}
-        % since the first argument absorbed by the function is actually the next
-        % character in the input stream, we have to leave it in place. In order
-        % to get the correct space after the command, we inspect this character.
-        % Sentence ending characters are followed by inter-sentence space which
-        % is larger that and regular space. \xspace determined when to add a
-        % regular space.
-        \str_if_in:nnTF {.!?} {#1} {#1\@} {\xspace#1}
-      }
-    }
+    {*} { \abs@aux{full}{#2}{#3} }
+    % create plus-form command version which explicitly uses long form of
+    % abbreviation: eg:
+    %  \AA+  => Alien Arcology
+    %  \AAs+ => Alien Arcologies  
+    {+} { \abs@aux{long}{#2}{#3} } 
+    % create minus-form command version which explicitly uses short form of
+    % abbreviation: eg:
+    %   \AA-  => AA
+    %   \AAs- => AAs
+    {-} { \abs@aux{short}{#2}{#3} }
   }
-  % % This happens after the embellished commands
-  % % space correction for sentence ending space and regular space
-  % \IfNextIn{.!?}{\@}{\xspace}
+  % This part happens after the embellished commands
+  % space correction for sentence ending space and regular space
+  { \cs_space_fix:n } % will grab next token in stream
+  % No embellishment => standard form: full form on first use, short form
+  % thereafter eg:
+  % \AA  => Alien Arcology (AA) first. AA thereafter.
+  {
+    \abs@context{ \csuse{cgls#2} } { \csuse{glsfmtlong#2} } {#3}
+    % since the first argument absorbed by the function is actually the next
+    % token in the input stream, we have to leave it in place when we return
+    % here. In order to get the correct space after the command, we need to
+    % inspect this token. Sentence ending characters are followed by
+    % inter-sentence space which is larger that and regular space. \xspace
+    % determines when to add a regular space.
+    \cs_space_fix:n {#1}
+  }
+}
+
+%
+\cs_new:Nn \cs_space_fix:n {
+  \str_if_in:nnTF {.!?} {#1} {#1\spacefactor=\sfcode`\.{}} {\xspace#1}
 }
 
 \cs_new:Nn \cs_ab_define:nnnnn { 
