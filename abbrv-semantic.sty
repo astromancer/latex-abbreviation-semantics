@@ -365,11 +365,13 @@
 % toggle whether to define lower case commands, false by default
 \bool_new:N \abs@def@lc 
 \bool_gset_false:N \abs@def@lc
-\cs_new:Nn \absEnableLowercaseDefs { \bool_gset_true:N \abs@def@lc }
-\cs_new:Nn \absDisableLowercaseDefs { \bool_gset_false:N \abs@def@lc }
+\cs_new:Nn \cs_enable_lc_defs: { \bool_gset_true:N \abs@def@lc }
+\cs_new:Nn \cs_disable_lc_defs: { \bool_gset_false:N \abs@def@lc }
+\cs_new_eq:NN \absEnableLowercaseDefs \cs_enable_lc_defs: 
+\cs_new_eq:NN \absDisableLowercaseDefs \cs_disable_lc_defs: 
 
 
-\NewDocumentCommand \abbreviation {s O{} m D<>{#3} O{#3} D(){#3s} m t!} {% chktex 36 chktex 1
+\NewDocumentCommand \abbreviation { s O{} m D<>{#3} O{#3} D(){#3s} m t! } {% chktex 36 chktex 1
   % -------------------------------------------------------------------------- %
   % Argument syntax:
   %   #1 star (*) if starred, also define plural form commands
