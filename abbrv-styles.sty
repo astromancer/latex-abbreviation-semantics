@@ -12,7 +12,7 @@
 % ---------------------------------------------------------------------------- %
 %  Title casing style. Used by case switching commands eg: \QPO \qpo
 
-\newcommand*{\@ab@lst@formatHelper}[3]{%
+\newcommand*{\@abs@listFormatter}[3]{%
   \glsfirstlongfont{%
   \ecapitalisefmtwords*{\@nameuse{glsaccesslong#3}{#1}}\ifglsxtrinsertinside#2\fi}%
   \ifglsxtrinsertinside\else#2\fi\glsxtrfullsep{#1}%
@@ -20,7 +20,7 @@
 }
 
 % Default case switch for style
-\let\ab@caseSwitchCmd\ecapitalisefmtwords%
+\let\abs@caseSwitchCmd\ecapitalisefmtwords%
 % \newcommand{\ab@caseSwitchCmd}[1]{\ecapitalisefmtwords*{#1}}%
 
 
@@ -30,7 +30,7 @@
 }{% Formatting
   \GlsXtrUseAbbrStyleFmts{long-short}%
   % Support title casing switch
-  \renewcommand*{\glslongfont}[1]{\ab@caseSwitchCmd{##1}}% glslongdefaultfont
+  \renewcommand*{\glslongfont}[1]{\abs@caseSwitchCmd{##1}}% glslongdefaultfont
   % Always use title case for full forms 
   \renewcommand*{\glsxtrfullformat}[2]{%
     \Glsxtrfullformat{##1}{##2}%
@@ -39,9 +39,9 @@
     \Glsxtrfullplformat{##1}{##2}%
   }%
   \renewcommand*{\Glsxtrfullformat}[2]{%
-    \@ab@lst@formatHelper{##1}{##2}{}%
+    \@abs@listFormatter{##1}{##2}{}%
   }%
   \renewcommand*{\Glsxtrfullplformat}[2]{%
-    \@ab@lst@formatHelper{##1}{##2}{pl}%
+    \@abs@listFormatter{##1}{##2}{pl}%
   }%
 }

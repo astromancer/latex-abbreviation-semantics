@@ -68,3 +68,6 @@
 *.pyc
 *-checkpoint.ipynb
 .pytest_cache
+
+#
+test.*
