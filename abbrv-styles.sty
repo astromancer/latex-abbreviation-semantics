@@ -20,8 +20,8 @@
 }
 
 % Default case switch for style
-\let\abs@caseSwitchCmd\ecapitalisefmtwords%
-% \newcommand{\ab@caseSwitchCmd}[1]{\ecapitalisefmtwords*{#1}}%
+\let\@abs@case\ecapitalisefmtwords%
+% \newcommand{\@abs@caseSwitchCmd}[1]{\ecapitalisefmtwords*{#1}}%
 
 
 \newabbreviationstyle{long-short-title}{%
@@ -30,7 +30,7 @@
 }{% Formatting
   \GlsXtrUseAbbrStyleFmts{long-short}%
   % Support title casing switch
-  \renewcommand*{\glslongfont}[1]{\abs@caseSwitchCmd{##1}}% glslongdefaultfont
+  \renewcommand*{\glslongfont}[1]{\@abs@case{##1}}% glslongdefaultfont
   % Always use title case for full forms 
   \renewcommand*{\glsxtrfullformat}[2]{%
     \Glsxtrfullformat{##1}{##2}%

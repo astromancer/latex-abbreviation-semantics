@@ -56,7 +56,7 @@
 }
 
 
-% Section
+% Sectioning
 % ---------------------------------------------------------------------------- %
 % hooks for lower level sectioning commands
 
@@ -137,25 +137,25 @@
 
 % ---------------------------------------------------------------------------- %
 % Messages
-\newcommand{\@ab@msg@alreadyDefined}[1]{%
-  Control sequence \@backslashchar#1 already exists. \@ab@msg@skip%
+\newcommand{\@abs@msg@alreadyDefined}[1]{%
+  Control sequence \@backslashchar#1 already exists. \@abs@msg@skip%
 }
-\newcommand{\@ab@msg@invalidName}[1]{%
-  Invalid control sequence name \@backslashchar#1. \@ab@msg@skip.%
+\newcommand{\@abs@msg@invalidName}[1]{%
+  Invalid control sequence name \@backslashchar#1. \@abs@msg@skip.%
 }
-\newcommand{\@ab@msg@freeName}[1]{%
+\newcommand{\@abs@msg@freeName}[1]{%
   Free name \@backslashchar#1.%
 }
-\newcommand{\@ab@msg@allowDefineName}[1]{%
+\newcommand{\@abs@msg@allowDefineName}[1]{%
   Definition of name \@backslashchar#1 is allowed.%
 }
 
-\newcommand{\@ab@msg@skip}{%
+\newcommand{\@abs@msg@skip}{%
   Skipping command definition for abbreviation with label "\abs@current@label",
   definition: "\abs@current@desc".%
 }
 
-\newcommand{\@ab@msg@overwrite}[1]{%
+\newcommand{\@abs@msg@overwrite}[1]{%
   Overwriting command \@backslashchar#1 for abbreviation with label "\abs@current@label",
   definition: "\abs@current@desc".%
 }
@@ -165,13 +165,14 @@
 \ExplSyntaxOn
 
 % Message for already defined control sequences
-\msg_new:nnn{abbrv-utils}{MsgAlreadyDefined}{\@ab@msg@alreadyDefined{#1}}
-\msg_new:nnn{abbrv-utils}{MsgInvalidName}{\@ab@msg@invalidName{#1}}
-\msg_new:nnn{abbrv-utils}{MsgFreeName}{\@ab@msg@freeName{#1}}
-\msg_new:nnn{abbrv-utils}{MsgAllowDefineName}{\@ab@msg@allowDefineName{#1}}
+\msg_new:nnn{abbrv-utils}{MsgAlreadyDefined}{\@abs@msg@alreadyDefined{#1}}
+\msg_new:nnn{abbrv-utils}{MsgInvalidName}{\@abs@msg@invalidName{#1}}
+\msg_new:nnn{abbrv-utils}{MsgFreeName}{\@abs@msg@freeName{#1}}
+\msg_new:nnn{abbrv-utils}{MsgAllowDefineName}{\@abs@msg@allowDefineName{#1}}
 \msg_new:nnn{abbrv-utils}{MsgDefineCmd}{Now\ defining:\ \@backslashchar#1}
-\msg_new:nnn{abbrv-utils}{MsgOverwriteCmd}{\@ab@msg@overwrite{#1}}
+\msg_new:nnn{abbrv-utils}{MsgOverwriteCmd}{\@abs@msg@overwrite{#1}}
 % \msg_new:nnn{abbrv-utils}{WTF}{WTF #1}
+\msg_new:nnn{abbrv-utils}{MsgSpaceFix}{Fixing~space~after~{#1}}
 
 \cs_generate_variant:Nn \msg_note:nnn {nnx}
 % ---------------------------------------------------------------------------- %
@@ -249,9 +250,9 @@
 
 % Function for deciding abbreviation function to use based on user info and 
 % context in which the command was used.
-\NewDocumentCommand \abs@context { m   O{#1}   m   O{#3} O{#3} m } {% chktex 1
+\NewDocumentCommand \@abs@context { m   O{#1}   m   O{#3} O{#3} m } {% chktex 1
   %                                TEX CAPTION SEC TOC   HEAD  LABEL
-  % \abs@context{<glsCmd>}
+  % \@abs@context{<glsCmd>}
   %        [glsCmdCaption]
   %        {<glsFmtCmd>}
   %        [glsFmtSectionHeader]
@@ -274,15 +275,15 @@
 
 % Helper function for function for passing abbreviation formatting variant to 
 % context resolver
-\NewDocumentCommand \abs@aux { m m m } {
-  \abs@context{\csuse{glsxtr#1#2}} % text form
-              {\csuse{glsfmt#1#2}} % header from
-              {#3} % label
+\NewDocumentCommand \@abs@aux { m m m } {
+  \@abs@context{\csuse{glsxtr#1#2}} % text form
+               {\csuse{glsfmt#1#2}} % header from
+               {#3} % label
 
   % switch back to title casing (for long-short-title style). This needs to
   % happen before replacing any absorbed tokens (which may be control sequence!)
   % in the input stream.
-  \cs_gset_eq:NN \abs@caseSwitchCmd \ecapitalisefmtwords
+  \cs_gset_eq:NN \@abs@case \ecapitalisefmtwords
 }
 
 % Get and call the abbreviation formatting command variant
@@ -296,17 +297,17 @@
     % abbreviation: eg:
     %  \AA*  => Alien Arcology (AA)
     %  \AAs* => Alien Arcologies (AAs)
-    {*} { \abs@aux{full}{#2}{#3} }
+    {*} { \@abs@aux{full}{#2}{#3} }
     % create plus-form command version which explicitly uses long form of
     % abbreviation: eg:
     %  \AA+  => Alien Arcology
     %  \AAs+ => Alien Arcologies  
-    {+} { \abs@aux{long}{#2}{#3} } 
+    {+} { \@abs@aux{long}{#2}{#3} } 
     % create minus-form command version which explicitly uses short form of
     % abbreviation: eg:
     %   \AA-  => AA
     %   \AAs- => AAs
-    {-} { \abs@aux{short}{#2}{#3} }
+    {-} { \@abs@aux{short}{#2}{#3} }
   }{ 
     % This part happens after the embellished commands
     % space correction for sentence ending space and regular space
@@ -316,7 +317,7 @@
     % No embellishment => standard form: full form on first use, short form
     % thereafter eg:
     % \AA  => Alien Arcology (AA) first. AA thereafter.
-    \abs@context{ \csuse{cgls#2} } { \csuse{glsfmtlong#2} } {#3}
+    \@abs@context{ \csuse{cgls#2} } { \csuse{glsfmtlong#2} } {#3}
 
     % since the first argument absorbed by the function is actually the next
     % token in the input stream, we have to leave it in place when we return
@@ -329,7 +330,8 @@
 }
 
 \cs_new:Nn \cs_space_fix:n {
-  \str_if_in:nnTF {.!?} {#1} {#1\spacefactor=\sfcode`\.{}} {\xspace#1}
+  % \msg_term:nnn{abbrv-utils}{MsgSpaceFix}{#1}
+  \str_if_in:nnTF {.!?} {#1} {#1\spacefactor=\sfcode`\.{}} {\xspace#1} 
 }
 
 % ---------------------------------------------------------------------------- %
@@ -348,11 +350,11 @@
 
     % This code will only run if definition allowed, or user requests overwrite
     % Decide which DocumentCommand to use based on if CS already exists
-    \cs_gset_eq:Nc \abs@def@cmd { \cs_if_free:cTF {#1} {New} {Renew} DocumentCommand }
+    \cs_gset_eq:Nc \@abs@def@cmd { \cs_if_free:cTF {#1} {New} {Renew} DocumentCommand }
 
     % Define the command
-    \exp_args:Nc \abs@def@cmd { #1 } { m } {
-      \tl_if_empty:nTF {#5} {} { \cs_gset_eq:NN \abs@caseSwitchCmd #5 }
+    \exp_args:Nc \@abs@def@cmd { #1 } { m } {
+      \tl_if_empty:nTF {#5} {} { \cs_gset_eq:NN \@abs@case #5 }
       \cs_ab_variant:nnn {##1} {#3} {#4}
     }
   }
@@ -366,12 +368,12 @@
 \tl_new:N \abs@current@label
 \tl_new:N \abs@current@cmd@lc  % lower case command name
 % CS used to define the commands [(Re)NewDocumentCommand]
-\cs_new_eq:NN \abs@def@cmd \NewDocumentCommand
+\cs_new_eq:NN \@abs@def@cmd \NewDocumentCommand
 % toggle whether to define lower case commands, false by default
-\bool_new:N \abs@def@lc 
-\bool_gset_false:N \abs@def@lc
-\cs_new:Nn \cs_enable_lc_defs: { \bool_gset_true:N \abs@def@lc }
-\cs_new:Nn \cs_disable_lc_defs: { \bool_gset_false:N \abs@def@lc }
+\bool_new:N \@abs@def@lc 
+\bool_gset_false:N \@abs@def@lc
+\cs_new:Nn \cs_enable_lc_defs: { \bool_gset_true:N \@abs@def@lc }
+\cs_new:Nn \cs_disable_lc_defs: { \bool_gset_false:N \@abs@def@lc }
 \cs_new_eq:NN \absEnableLowercaseDefs \cs_enable_lc_defs: 
 \cs_new_eq:NN \absDisableLowercaseDefs \cs_disable_lc_defs: 
 
@@ -416,7 +418,7 @@
   % lowercase singular
   % -------------------------------------------------------------------------- %
   % check if we need to define lowercase command versions
-  \bool_if:nT {\abs@def@lc} {
+  \bool_if:nT {\@abs@def@lc} {
     % define command with lowercase abbreviation letters. eg:
     %   \aa => alien arcology
 
@@ -454,7 +456,7 @@
     % lowercase plural
     % -------------------------------------------------------------------------- %
     % check if we need to define lowercase command versions for plural terms
-    \bool_if:nT {\abs@def@lc} {
+    \bool_if:nT {\@abs@def@lc} {
       % check if user input a lowercase command name, in which case, the
       % lowercase plural verion was define above
       \if_lowercase:nTF {#5} {} {
