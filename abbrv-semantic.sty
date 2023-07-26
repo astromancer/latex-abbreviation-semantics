@@ -471,3 +471,72 @@
     }
   }
 }
+
+
+
+% ---------------------------------------------------------------------------- %
+% Symbols
+
+\cs_new:Nn \cs_symbol_define:nnn { 
+  % #1 command name
+  % #2 overwrite flag
+  % #3 label
+
+  % define command with same name as the abbreviation if possible.
+  \if_csdef_allowed:xnT {#1} {#2} {
+    % name valid for new command
+    \msg_note:nnn{abbrv-utils}{MsgDefineCmd}{#1}
+
+    % This code will only run if definition allowed, or user requests overwrite
+    % Decide which DocumentCommand to use based on if CS already exists
+    \cs_gset_eq:Nc \@abs@def@cmd { \cs_if_free:cTF {#1} {New} {Renew} DocumentCommand }
+
+    % Define the command
+    \exp_args:Nc \@abs@def@cmd { #1 } { } {
+      \@abs@context{\glsxtrshort}{\glsxtrshort}[\glsfmtshort]{#3}
+      \mode_if_math:F {
+        % will grab next token in input stream and add the correct space (if
+        % any) after the symbol command
+        \cs_space_fix:n
+      }
+    }
+  }
+}
+
+
+\NewDocumentCommand \newsym { m D<>{#1} O{#1} m O{} t! } {% chktex 36 chktex 1
+  % -------------------------------------------------------------------------- %
+  % Argument syntax:  % {symbol}<label>[cmd]{description}[options]
+  
+  %   #1 symbol for typesetting in document eg: λ. 
+  %   #2 <optional> String to be used as glossaries label eg: <abr:λ> 
+  %       Defaults to short form, eg λ.
+  %   #3 [optional] command name: default is same letters as symbol.
+  %       Defaults to short form, eg \λ.
+  %   #4 The symbol description eg: {The mean parameter.}
+  %   #5 \newabbreviation key=val options
+  %   #6
+  %
+  % NOTE: You will still need \texorpdfstring{}{} explicitly in the section
+  % header for the suffixed versions to get correct bookmark text. Can't find a
+  % way around this...
+
+
+  % first define the abbreviation via glossaries' \newabbreviation
+  % \newabbreviation[options]{label}{short}{long}
+  \newabbreviation[#5, type=symbols, category=symbols]{#2}{\ensuremath{#1}}{#4}
+  % \newglossaryentry{#2}{short=\ensuremath{#1},
+  %                       description=#4,
+  %                       #5, 
+  %                       type=symbols, 
+  %                       category=symbols}
+  
+  % current label and description for messages
+  \tl_gset:Nx \abs@current@label{\text_purify:n{#2}}
+  \tl_gset:Nx \abs@current@desc {\text_purify:n{#4}}
+
+  \cs_symbol_define:nnn {#3} {#6} {#2}
+}
+
+
+\ExplSyntaxOff
