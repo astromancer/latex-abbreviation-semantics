@@ -251,7 +251,7 @@
 % Function for deciding abbreviation function to use based on user info and 
 % context in which the command was used.
 \NewDocumentCommand \@abs@context { m   O{#1}   m   O{#3} O{#3} m } {% chktex 1
-  %                                TEX CAPTION SEC TOC   HEAD  LABEL
+  %                                 TEX CAPTION SEC TOC   HEAD  LABEL
   % \@abs@context{<glsCmd>}
   %        [glsCmdCaption]
   %        {<glsFmtCmd>}
@@ -515,7 +515,7 @@
   %       Defaults to short form, eg \λ.
   %   #4 The symbol description eg: {The mean parameter.}
   %   #5 \newabbreviation key=val options
-  %   #6
+  %   #6 ! overwrite flag
   %
   % NOTE: You will still need \texorpdfstring{}{} explicitly in the section
   % header for the suffixed versions to get correct bookmark text. Can't find a
