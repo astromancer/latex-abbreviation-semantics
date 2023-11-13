@@ -1,4 +1,6 @@
-# semantic-abbreviations-latex
+# latex-abbreviation-semantics
+
+> User friendly abbreviation definitions for latex documents. 📜✨
 
 This repo provides some latex utilities that enable you to define abbreviation
 (acronym) commands that automatically expand to the appropriate (context
@@ -20,15 +22,18 @@ certain use cases. For example, allowing you to write `\AAs+` instead of
 `\glsxtrlongpl{AA}` or `\glsfmtlongpl{AA}` depending on context.
 
 # Install
-There is no install script, just copy the files into your main build folder.
+There is no install script, just copy or clone the files into your main build folder.
+```shell
+git clone https://github.com/astromancer/semantic-abbreviations-latex/
+```
 
 # Usage
 ## Basic
 
 Load the package by adding these lines in your document preamble.
 ```latex
-\usepackage{abbrv-semantic}
-\usepackage{abbrv-styles}
+\usepackage{abbreviation-semantics}
+\usepackage{abbreviation-styles}
 ```
 
 Abbreviations are defined as follows:
@@ -37,15 +42,15 @@ Abbreviations are defined as follows:
 ```
 
 
-Following this definition, the following commands will be made available in the
+After this definition, the following commands will be made available in the
 document:
 
-| Command | Expansion | Description | 
-| --- | --- | --- |
-| **`\XL`**   | `Xeno-linguistics (XL)`  upon first use,  `XL` thereafter | Standard form |
-| **`\XL*`**  | `Xeno-linguistics (XL)`   | Full form |
-| **`\XL+`**  | `Xeno-linguistics`        | Long form |
-| **`\XL-`**  | `XL`                      | Short form |
+| Form     | Command     | Expansion | 
+| ---      | ---         | --- |
+| Standard | **`\XL`**   | `Xeno-linguistics (XL)`  upon first use,  `XL` thereafter |
+| Full     | **`\XL*`**  | `Xeno-linguistics (XL)`   |
+| Long     | **`\XL+`**  | `Xeno-linguistics`        |
+| Short    | **`\XL-`**  | `XL`                      |
 
 
 ## Enabling lowercase command definitions
@@ -57,12 +62,12 @@ line to your document preamble (with the abbreviation definition as above):
 In addition to the titlecase expanding commands shown above, the following
 lowercase expanding commands will also be made available.
 
-| Command | Expansion | Description | 
-| --- | --- | --- |
-| **`\xl`**   | `xeno-linguistics (XL)`  upon first use,  `XL` thereafter | Standard form |
-| **`\xl*`**  | `xeno-linguistics (XL)`   | Full form |
-| **`\xl+`**  | `xeno-linguistics`        | Long form |
-<!-- | \xl-  | `XL`                      | Short form | -->
+| Form     | Command     | Expansion | 
+| ---      | ---         | --- |
+| Standard | **`\xl`**   | `xeno-linguistics (XL)`  upon first use,  `XL` thereafter |
+| Full     | **`\xl*`**  | `xeno-linguistics (XL)`   |
+| Long     | **`\xl+`**  | `xeno-linguistics`        |
+<!-- | Short | \xl-  | `XL`                      | -->
 
 ## Overwriting commands
 By default, existing commands will not be overwritten. You may force the
@@ -83,21 +88,21 @@ use the star variant of the `\abbreviation` command:
 Notice that the optional key-value parameters are passed through to glossaries'
 `\newabbreviation` command.  After this definition, the following document
 commands will be available:
-| Singular forms | Expansion | 
-| --- | --- | 
-| **`\AA`**   | `Alien Arcology (AA)`  upon first use,  `AA` thereafter | 
-| **`\AA*`**  | `Alien Arcology (AA)`   | 
-| **`\AA+`**  | `Alien Arcology`        | 
-| **`\AA-`**  | `AA`                      | 
+| Singular forms | Expansion                                               |
+| ---            | ---                                                     | 
+| **`\AA`**      | `Alien Arcology (AA)`  upon first use,  `AA` thereafter | 
+| **`\AA*`**     | `Alien Arcology (AA)`                                   | 
+| **`\AA+`**     | `Alien Arcology`                                        | 
+| **`\AA-`**     | `AA`                                                    | 
 
 In addition, the following plural forms will also be available.
 
-| **Plural forms** |  | 
-| --- | --- | 
-| **`\AAs`**   | `Alien Arcologies (AAs)`  upon first use,  `AAs` thereafter | 
-| **`\AAs*`**  | `Alien Arcologies (AAs)`   | 
-| **`\AAs+`**  | `Alien Arcologies`         | 
-| **`\AAs-`**  | `AAs`                      | 
+| **Plural forms** |                                                             |
+| ---              | ---                                                         | 
+| **`\AAs`**       | `Alien Arcologies (AAs)`  upon first use,  `AAs` thereafter | 
+| **`\AAs*`**      | `Alien Arcologies (AAs)`                                    | 
+| **`\AAs+`**      | `Alien Arcologies`                                          | 
+| **`\AAs-`**      | `AAs`                                                       | 
 
 In addition, the lower case plural commands will also be defined if
 `\absEnableLowercaseDefs{}` was used in the preamble.
@@ -114,7 +119,7 @@ This will define the entry with internal label `mylabel:SNe` having short form
 is `\BANG`, which will expand identically to the standard glossary command
 `\cgls{mylabel:SNe}` in the text context. Likewise, the plural form command
 `\SNe` will expand identically to the standard glossary command
-`\cglspl{mylabel:SNe}`
+`\cglspl{mylabel:SNe}`.
 
 ## Sectioning commands
 The abbreviation commands can usually be used in sectioning commands without
@@ -127,14 +132,14 @@ also expanded to long form and will resolve correctly.
  Have a look at the [`main.tex`](/main.tex) document for a more complete example
 usage that also demonstrates these use cases.
 
-# Repo File Descriptions
+# Repo File Forms
 
-| File | Description | 
-| --- | --- |  
-| [`main.tex`](/main.tex)                     | Main latex document example.
-| [`abbrv-defs.tex`](/abbrv-defs.tex)         | Your abbreviations should be defined here.
-| [`abbrv-styles.tex` ](/abbrv-styles.tex)    | Styles for formatting the abbreviations.
-| [`abbrv-semantic.tex`](/abbrv-semantic.tex) | Command definition mechanisms live here.
+| File | Form                                                 |
+| ---  | ---                                                  |
+| [`main.tex`](/main.tex)                                     | Main latex document example.
+| [`abbreviation-defs.tex`](/abbreviation-defs.tex)           | Your abbreviations should be defined here.
+| [`abbreviation-styles.tex` ](/abbreviation-styles.tex)      | Styles for formatting the abbreviations.
+| [`abbreviation-semantics.tex`](/abbreviation-semantics.tex) | Command definition mechanisms live here.
 
 # Contribute
 PRs are welcome! 🚀😎
