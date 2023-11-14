@@ -24,7 +24,7 @@ certain use cases. For example, allowing you to write `\AAs+` instead of
 # Install
 There is no install script, just copy or clone the files into your main build folder.
 ```shell
-git clone https://github.com/astromancer/semantic-abbreviations-latex/
+git clone https://github.com/astromancer/latex-abbreviation-semantics/
 ```
 
 # Usage
