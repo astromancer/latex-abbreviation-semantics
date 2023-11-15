@@ -5,7 +5,7 @@
 This repo provides some latex utilities that enable you to define abbreviation
 (acronym) commands that automatically expand to the appropriate (context
 specific) form in the document.  This allows one to write the abbreviations in
-the latex source code with semantics that closely resemble natural written
+the latex source code with syntax that closely resemble natural written
 language.
 
 The context specific commands (tex vs section header vs caption etc), are
