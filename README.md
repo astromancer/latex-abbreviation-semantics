@@ -1,4 +1,4 @@
-# latex-abbreviation-semantics
+# latex-abbreviations
 
 > User friendly abbreviation definitions for latex documents. 📜✨
 
@@ -22,9 +22,10 @@ certain use cases. For example, allowing you to write `\AAs+` instead of
 `\glsxtrlongpl{AA}` or `\glsfmtlongpl{AA}` depending on context.
 
 # Install
-There is no install script, just copy or clone the files into your main build folder.
+There is no install script, just copy or clone the files into your main build 
+folder.
 ```shell
-git clone https://github.com/astromancer/latex-abbreviation-semantics/
+git clone https://github.com/astromancer/latex-abbreviations/
 ```
 
 # Usage
@@ -32,7 +33,7 @@ git clone https://github.com/astromancer/latex-abbreviation-semantics/
 
 Load the package by adding these lines in your document preamble.
 ```latex
-\usepackage{abbreviation-semantics}
+\usepackage{abbreviations}
 \usepackage{abbreviation-styles}
 ```
 
@@ -134,12 +135,12 @@ usage that also demonstrates these use cases.
 
 # Repo File Forms
 
-| File | Form                                                 |
-| ---  | ---                                                  |
-| [`main.tex`](/main.tex)                                     | Main latex document example.
-| [`abbreviation-defs.tex`](/abbreviation-defs.tex)           | Your abbreviations should be defined here.
-| [`abbreviation-styles.tex` ](/abbreviation-styles.tex)      | Styles for formatting the abbreviations.
-| [`abbreviation-semantics.tex`](/abbreviation-semantics.tex) | Command definition mechanisms live here.
+| File | Form                                            |
+| ---  | ---                                             |
+| [`main.tex`](/main.tex)                                | Main latex document example.
+| [`definitions.tex`](/definitions.tex)                  | Your abbreviations should be defined here.
+| [`abbreviation-styles.tex` ](/abbreviation-styles.tex) | Styles for formatting the abbreviations.
+| [`abbreviations.tex`](/abbreviations.tex)              | Command definition mechanisms live here.
 
 # Contribute
 PRs are welcome! 🚀😎
